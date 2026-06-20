@@ -1,0 +1,21 @@
+services:
+  php82:
+    image: serversideup/php:8.2-cli
+    volumes:
+      - ./:/var/www/html
+    environment:
+      SHOW_WELCOME_MESSAGE: false
+
+  php83:
+    image: serversideup/php:8.3-cli
+    volumes:
+      - ./:/var/www/html
+    environment:
+      SHOW_WELCOME_MESSAGE: false
+
+  php84:
+    image: serversideup/php:8.4-cli
+    volumes:
+      - ./:/var/www/html
+    environment:
+      SHOW_WELCOME_MESSAGE: false
