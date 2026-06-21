@@ -4,6 +4,9 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "JsonShape",
   description: "Typed objects for your database JSON columns in Laravel.",
+  // Served from https://plumthedev.github.io/json-shape/ — assets must resolve
+  // under that sub-path, not the domain root.
+  base: "/json-shape/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
