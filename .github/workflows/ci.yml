@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: "8.4"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Quality gate — runs on every branch and pull request (develop included).
+  # ---------------------------------------------------------------------------
+  quality:
+    name: ${{ matrix.check.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        check:
+          - name: Code style (Pint)
+            run: vendor/bin/pint --config=./codequality/pint.json --test
+          - name: Static analysis (PHPStan)
+            run: vendor/bin/phpstan analyse --configuration=./codequality/phpstan.neon --no-progress
+          - name: Tests (PHPUnit)
+            run: vendor/bin/phpunit --configuration=./codequality/phpunit.xml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: ${{ matrix.check.name }}
+        run: ${{ matrix.check.run }}
+
+  # ---------------------------------------------------------------------------
+  # Docs build — smoke-check on every branch and pull request. Catches broken
+  # docs without deploying anything (deploy happens later, main only).
+  # ---------------------------------------------------------------------------
+  docs-build:
+    name: Docs build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build docs
+        working-directory: docs
+        run: |
+          npm install
+          npm run docs:build
+
+  # ---------------------------------------------------------------------------
+  # Release — main branch only. Tags, changelog, contributors, GitHub release.
+  # Packagist picks up the new tag through its webhook.
+  # ---------------------------------------------------------------------------
+  release:
+    name: Release
+    needs: [quality, docs-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.semantic.outputs.new_release_published }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Refresh contributors list
+        run: |
+          {
+            echo "# Contributors"
+            echo
+            echo "Thanks to everyone who has contributed to JsonShape:"
+            echo
+            git shortlog -sne --no-merges HEAD \
+              | sed -E 's/^[[:space:]]*[0-9]+[[:space:]]+/- /'
+          } > CONTRIBUTORS.md
+
+      - name: Semantic release
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --yes \
+            -p semantic-release \
+            -p @semantic-release/changelog \
+            -p @semantic-release/git \
+            -p conventional-changelog-conventionalcommits \
+            semantic-release
+
+  # ---------------------------------------------------------------------------
+  # Docs — main branch only. Builds VitePress and deploys to GitHub Pages.
+  # ---------------------------------------------------------------------------
+  docs:
+    name: Deploy docs
+    needs: release
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build docs
+        working-directory: docs
+        run: |
+          npm install
+          npm run docs:build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/.vitepress/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

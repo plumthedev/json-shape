@@ -1,50 +1,80 @@
 {
-  "name": "plumthedev/json-shape",
-  "description": "TBA",
-  "type": "library",
-  "keywords": [
-    "json",
-    "shape",
-    "schema",
-    "php"
-  ],
-  "homepage": "https://github.com/plumthedev/json-shape",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Kacper Pruszyński (plumthedev)",
-      "email": "kacper.pruszysnki99@gmail.com",
-      "homepage": "https://github.com/plumthedev"
-    }
-  ],
-  "support": {
-    "issues": "https://github.com/plumthedev/json-shape/issues",
-    "source": "https://github.com/plumthedev/json-shape"
-  },
-  "require": {
-    "php": ">=8.2"
-  },
-  "require-dev": {
-    "roave/security-advisories": "dev-latest"
-  },
-  "autoload": {
-    "psr-4": {
-      "Plumthedev\\JsonShape\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Plumthedev\\JsonShape\\Tests\\": "tests/"
-    }
-  },
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "config": {
-    "sort-packages": true,
-    "optimize-autoloader": true,
-    "audit": {
-      "abandoned": "report"
+    "name": "plumthedev/json-shape",
+    "description": "TBA",
+    "type": "library",
+    "keywords": [
+        "json",
+        "shape",
+        "schema",
+        "php"
+    ],
+    "homepage": "https://github.com/plumthedev/json-shape",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kacper Pruszyński (plumthedev)",
+            "email": "kacper.pruszysnki99@gmail.com",
+            "homepage": "https://github.com/plumthedev"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/plumthedev/json-shape/issues",
+        "source": "https://github.com/plumthedev/json-shape"
     },
-    "allow-plugins": {}
-  }
+    "require": {
+        "php": ">=8.4",
+        "illuminate/contracts": "^13.16",
+        "illuminate/database": "^13.16",
+        "illuminate/support": "^13.16"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^11.1",
+        "phpstan/phpstan": "^2.2",
+        "phpunit/phpunit": "^13",
+        "roave/security-advisories": "dev-latest"
+    },
+    "autoload": {
+        "psr-4": {
+            "Plumthedev\\JsonShape\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Plumthedev\\JsonShape\\Tests\\": "tests/",
+            "Plumthedev\\JsonShape\\Examples\\": "examples/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "audit": {
+            "abandoned": "report"
+        },
+        "allow-plugins": []
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "@php vendor/bin/pint --ansi",
+            "@php vendor/bin/phpstan analyse --verbose --ansi"
+        ]
+    }
 }
