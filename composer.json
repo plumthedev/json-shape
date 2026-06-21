@@ -57,7 +57,7 @@
         "audit": {
             "abandoned": "report"
         },
-        "allow-plugins": []
+        "allow-plugins": {}
     },
     "scripts": {
         "post-autoload-dump": [
