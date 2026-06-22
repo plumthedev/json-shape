@@ -17,14 +17,16 @@ export default defineConfig({
     sidebar: {
       '/usage': [
         {
-          text: 'Usage',
+          text: 'Usage guide',
           items: [
             { text: 'Overview', link: '/usage' },
-            { text: 'The example shape', link: '/usage/the-example-shape' },
-            { text: 'Reading properties', link: '/usage/reading-properties' },
-            { text: 'Setting properties', link: '/usage/setting-properties' },
-            { text: 'Eloquent support', link: '/usage/eloquent-support' },
-            { text: 'Common tools', link: '/usage/common-tools' }
+            { text: '1. Define a shape', link: '/usage/defining-a-shape' },
+            { text: '2. Read values', link: '/usage/reading-values' },
+            { text: '3. Write values', link: '/usage/writing-values' },
+            { text: '4. Cast it on a model', link: '/usage/eloquent-casting' },
+            { text: '5. Create & combine shapes', link: '/usage/creating-shapes' },
+            { text: '6. Type safety in depth', link: '/usage/type-safety' },
+            { text: '7. Helpers, macros & errors', link: '/usage/helpers' }
           ]
         }
       ]

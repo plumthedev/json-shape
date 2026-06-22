@@ -1,9 +1,15 @@
 {
     "name": "plumthedev/json-shape",
-    "description": "TBA",
+    "description": "Typed objects for your Laravel JSON columns - autocomplete and static analysis included.",
     "type": "library",
     "keywords": [
+        "laravel",
+        "eloquent",
+        "cast",
         "json",
+        "json-column",
+        "typed",
+        "phpstan",
         "shape",
         "schema",
         "php"
