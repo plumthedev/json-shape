@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/plumthedev/json-shape/compare/v1.0.0...v1.0.1) (2026-06-22)
+
+### Bug Fixes
+
+* docs and readme rewritted ([a471105](https://github.com/plumthedev/json-shape/commit/a4711057ee25fdf1789dbb9b1f08db6178dc764d))
+
 ## 1.0.0 (2026-06-21)
 
 ### Features
